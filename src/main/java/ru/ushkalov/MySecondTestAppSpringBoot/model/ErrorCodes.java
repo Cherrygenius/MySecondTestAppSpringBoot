@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ErrorCodes {
     EMPTY(""),
-    VALIDATION_EXEPTION("ValidationException"),
-    UNKNOWN_EXEPTION("UnknownException"),
-    UNSUPPORTED_EXEPTION("UnsupportedException");
+    VALIDATION_EXCEPTION("ValidationException"),
+    UNKNOWN_EXCEPTION("UnknownException"),
+    UNSUPPORTED_EXCEPTION("UnsupportedException");
 
     private final String name;
 

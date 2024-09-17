@@ -17,6 +17,7 @@ import ru.ushkalov.MySecondTestAppSpringBoot.service.ModifyResponceService;
 import ru.ushkalov.MySecondTestAppSpringBoot.service.UnsupportedCodeService;
 import ru.ushkalov.MySecondTestAppSpringBoot.service.ValidationService;
 import util.DataTimeUtil;
+
 import java.util.Date;
 
 @Slf4j
@@ -28,15 +29,14 @@ public class MyController {
 
     @Autowired
     public MyController(ValidationService validationService, UnsupportedCodeService unsupportedCodeService,
-            @Qualifier("ModifySystemTimeResponceService") ModifyResponceService modifyResponceService){
+                        @Qualifier("ModifySystemTimeResponceService") ModifyResponceService modifyResponceService) {
         this.validationService = validationService;
         this.unsupportedCodeService = unsupportedCodeService;
         this.modifyResponceService = modifyResponceService;
-
     }
+
     @PostMapping("/feedback")
     public ResponseEntity<Responce> feedback(@Valid @RequestBody Request request, BindingResult bindingResult) {
-
         log.info("request: {}", request);
 
         Responce responce = Responce.builder()
@@ -47,26 +47,34 @@ public class MyController {
                 .errorCode(ErrorCodes.EMPTY)
                 .errorMessage(ErrorMessages.EMPTY)
                 .build();
+
+        log.info("Созданный ответ: {}", responce);
+
         try {
             validationService.isValid(bindingResult);
             unsupportedCodeService.isSupported(Integer.parseInt(request.getUid()));
-        } catch (ValidationFailedException e){
+        } catch (ValidationFailedException e) {
             responce.setCode(Codes.FAILED);
-            responce.setErrorCode(ErrorCodes.VALIDATION_EXEPTION);
+            responce.setErrorCode(ErrorCodes.VALIDATION_EXCEPTION);
             responce.setErrorMessage(ErrorMessages.VALIDATION);
+            log.error("Ответ после ошибки валидации: {}", responce);
             return new ResponseEntity<>(responce, HttpStatus.BAD_REQUEST);
         } catch (UnsupportedCodeException e) {
             responce.setCode(Codes.FAILED);
-            responce.setErrorCode(ErrorCodes.UNSUPPORTED_EXEPTION);
+            responce.setErrorCode(ErrorCodes.UNSUPPORTED_EXCEPTION);
             responce.setErrorMessage(ErrorMessages.UNSUPPORTED);
+            log.error("Ответ после ошибки неподдерживаемого кода: {}", responce);
             return new ResponseEntity<>(responce, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             responce.setCode(Codes.FAILED);
-            responce.setErrorCode(ErrorCodes.UNKNOWN_EXEPTION);
+            responce.setErrorCode(ErrorCodes.UNKNOWN_EXCEPTION);
             responce.setErrorMessage(ErrorMessages.UNKNOWN);
+            log.error("Ответ после неизвестной ошибки: {}", responce);
             return new ResponseEntity<>(responce, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
         modifyResponceService.modify(responce);
+        log.info("Ответ после модификации: {}", responce);
         return new ResponseEntity<>(responce, HttpStatus.OK);
     }
 }
