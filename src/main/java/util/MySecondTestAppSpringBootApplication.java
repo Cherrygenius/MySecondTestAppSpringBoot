@@ -1,4 +1,4 @@
-package ru.ushkalov.MySecondTestAppSpringBoot;
+package util;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
